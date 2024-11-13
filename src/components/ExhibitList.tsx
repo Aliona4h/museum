@@ -1,41 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Container, Alert, Spinner } from "react-bootstrap";
 import ExhibitCard from "./ExhibitCard";
 import Pagination from "./Pagination";
-import { fetchExhibits } from "../api/exhibits";
-import { useSelector } from "react-redux";
+import { useRequest } from "ahooks";
+import axiosInstance from "../api/axiosInstance";
 import { Exhibit } from "../types/types";
 
-const ExhibitList: React.FC = () => {
-  const [exhibits, setExhibits] = useState<Exhibit[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const user = useSelector((state: any) => state.auth.user);
+const fetchExhibits = (page: number) =>
+  axiosInstance.get<{ data: Exhibit[]; lastPage: number }>("api/exhibits", {
+    params: { page },
+  });
 
-  useEffect(() => {
-    const loadExhibits = async () => {
-      setLoading(true);
-      try {
-        const { data, lastPage } = await fetchExhibits(currentPage);
-        setExhibits(data);
-        setLastPage(lastPage);
-      } catch (error) {
-        setError("Failed to load exhibits");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadExhibits();
-  }, [currentPage]);
+const ExhibitList: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { data, loading, error } = useRequest(
+    () => fetchExhibits(currentPage),
+    { refreshDeps: [currentPage] }
+  );
+
+  const exhibits = data?.data?.data || [];
+  const lastPage = data?.data?.lastPage || 1;
 
   return (
     <Container
       className="my-5 d-flex flex-column justify-content-center align-items-center"
       style={{ minHeight: "100vh" }}
     >
-      {error && <Alert variant="danger">{error}</Alert>}
+      {error && <Alert variant="danger">{error.message}</Alert>}
       {loading ? (
         <div className="text-center">
           <Spinner animation="border" />
@@ -44,13 +36,8 @@ const ExhibitList: React.FC = () => {
       ) : (
         <>
           <div className="d-flex flex-column justify-content-center align-items-center">
-            {exhibits.map((exhibit) => (
-              <ExhibitCard
-                key={exhibit.id}
-                exhibit={exhibit}
-                user={user}
-                onRemove={() => {}}
-              />
+            {exhibits.map((exhibit: Exhibit) => (
+              <ExhibitCard key={exhibit.id} exhibit={exhibit} />
             ))}
           </div>
           <Pagination
@@ -63,5 +50,4 @@ const ExhibitList: React.FC = () => {
     </Container>
   );
 };
-
 export default ExhibitList;

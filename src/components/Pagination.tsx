@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Row, Col, Container } from "react-bootstrap";
+import { Button, Container, Col, Row } from "react-bootstrap";
 
 const Pagination: React.FC<{
   currentPage: number;
@@ -11,9 +11,8 @@ const Pagination: React.FC<{
       <Row className="justify-content-center">
         <Col xs="auto">
           <Button
-            variant="primary"
-            onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
+            onClick={() => onPageChange(currentPage - 1)}
           >
             Previous
           </Button>
@@ -25,9 +24,8 @@ const Pagination: React.FC<{
         </Col>
         <Col xs="auto">
           <Button
-            variant="primary"
-            onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === lastPage}
+            onClick={() => onPageChange(currentPage + 1)}
           >
             Next
           </Button>

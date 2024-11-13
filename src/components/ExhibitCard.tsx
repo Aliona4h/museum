@@ -6,8 +6,8 @@ import axiosInstance from "../api/axiosInstance";
 
 type ExhibitCardProps = {
   exhibit: any;
-  user: any;
-  onRemove: (exhibitId: string) => void;
+  user?: any;
+  onRemove?: (exhibitId: string) => void;
 };
 
 const ExhibitCard: React.FC<ExhibitCardProps> = ({ exhibit, user }) => {

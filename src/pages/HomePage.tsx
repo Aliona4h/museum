@@ -1,31 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { fetchAllExhibits } from "../api/exhibits";
 import { Alert, Card, Container, Row, Col } from "react-bootstrap";
 import axiosInstance from "../api/axiosInstance";
+import { useRequest } from "ahooks";
 
 const HomePage: React.FC = () => {
-  const [allPosts, setAllPosts] = useState<any[]>([]);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  useEffect(() => {
-    const loadAllPosts = async () => {
-      try {
-        const posts = await fetchAllExhibits();
-        setAllPosts(posts);
-      } catch (error) {
-        setErrorMessage("Failed to load posts.");
-      }
-    };
-
-    loadAllPosts();
-  }, []);
+  const { data: allPosts = [], error } = useRequest(fetchAllExhibits);
 
   return (
     <Container className="mt-4">
-      {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
+      {error && <Alert variant="danger">{error.message}</Alert>}
 
       <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-        {allPosts.map((post) => (
+        {allPosts.map((post: any) => (
           <Col key={post.id}>
             <Card className="h-100 shadow-sm">
               <Card.Img
